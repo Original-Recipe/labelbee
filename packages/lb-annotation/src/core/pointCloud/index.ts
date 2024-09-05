@@ -544,6 +544,12 @@ export class PointCloud extends EventListener {
       group.add(boxID);
     }
 
+    // 生成并添加attribute标签
+    const attributeLabel = this.generateBoxAttributeLabel(boxParams);
+    if (attributeLabel) {
+      group.add(attributeLabel);
+    }
+
     group.add(box);
     group.add(arrow);
     if (center) {
@@ -1333,6 +1339,23 @@ export class PointCloud extends EventListener {
     boxID.scale.set(5, 5, 5);
     boxID.position.set(-boxParams.width / 2, 0, boxParams.depth / 2 + 0.5);
     return boxID;
+  };
+
+  public generateBoxAttributeLabel = (boxParams: IPointCloudBox) => {
+    if (!boxParams.attribute) {
+      return;
+    }
+
+    const texture = new THREE.Texture(this.getTextCanvas(boxParams.attribute.toString()));
+    texture.needsUpdate = true;
+    const sprite = new THREE.SpriteMaterial({ map: texture, depthWrite: false });
+    const attributeLabel = new THREE.Sprite(sprite);
+    attributeLabel.scale.set(5, 5, 5);
+
+    // 将label放在box的下方
+    attributeLabel.position.set(-boxParams.width / 2, boxParams.height, -boxParams.depth / 2);
+
+    return attributeLabel;
   };
 
   public getTextCanvas(text: string) {
