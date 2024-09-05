@@ -714,6 +714,9 @@ export const PointCloudProvider: React.FC<PropsWithChildren<{}>> = ({ children }
           points: points.geometry.attributes.position.array,
         });
 
+        console.log('$$start highlightOriginPointCloud ' + selectedID);
+        console.time('$$end highlightOriginPointCloud ' + selectedID);
+
         const color = await mainViewInstance?.highlightOriginPointCloud(
           pointCloudList,
           highlightIndex,
@@ -726,6 +729,8 @@ export const PointCloudProvider: React.FC<PropsWithChildren<{}>> = ({ children }
         return color;
       } catch (error) {
         console.error('call highlightOriginPointCloud error', error);
+      } finally {
+        console.timeEnd('$$end highlightOriginPointCloud ' + selectedID);
       }
     };
 

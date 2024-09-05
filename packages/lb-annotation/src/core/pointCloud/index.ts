@@ -1123,6 +1123,8 @@ export class PointCloud extends EventListener {
           .then((res: any) => {
             const { color } = res;
             let combinedColor = color;
+            // window.console.log(color, 'colorcolor');
+            // window.console.time('1232');
             if (modifiedBoxIds.length || resetAreas.length) {
               combinedColor = color.map((item: any, index: number) => {
                 if (item === -1) {
@@ -1133,6 +1135,7 @@ export class PointCloud extends EventListener {
                 return item;
               });
             }
+            // window.console.timeEnd('1232');
             const colorAttribute = new THREE.BufferAttribute(combinedColor, 3);
             /**
              * Need to return;
