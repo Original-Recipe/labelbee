@@ -40,8 +40,8 @@ interface IProps {
   };
   staticMode?: boolean;
   measureVisible?: boolean;
-  pointCloudBoxList: IPointCloudBoxList;
-  hiddenText: boolean;
+  pointCloudBoxList?: IPointCloudBoxList;
+  hiddenText?: boolean;
 }
 
 const DEFAULT_SIZE = {
@@ -88,8 +88,8 @@ const AnnotationView = (props: IProps, ref: any) => {
     globalStyle,
     afterImgOnLoad,
     measureVisible,
-    pointCloudBoxList,
-    hiddenText,
+    pointCloudBoxList = [],
+    hiddenText = false,
   } = props;
   const size = sizeInitialized(props.size);
   const [loading, setLoading] = useState(false);
@@ -175,11 +175,15 @@ const AnnotationView = (props: IProps, ref: any) => {
   }, [src, measureVisible, fallbackSrc, loadImage]);
 
   useEffect(() => {
-    viewOperation.current.setPointCloudBoxList(pointCloudBoxList);
+    if (viewOperation?.current) {
+      viewOperation.current.setPointCloudBoxList(pointCloudBoxList);
+    }
   }, [pointCloudBoxList]);
 
   useEffect(() => {
-    viewOperation.current.setHiddenText(hiddenText);
+    if (viewOperation?.current) {
+      viewOperation.current?.setHiddenText(hiddenText);
+    }
   }, [hiddenText]);
 
   /**
