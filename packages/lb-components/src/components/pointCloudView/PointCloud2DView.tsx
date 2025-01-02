@@ -123,6 +123,7 @@ const PointCloud2DView = ({
     selectedIDs,
     windowKeydownListenerHook,
     setIsLargeStatus,
+    hover2DSingleViewIndex,
   } = useContext(PointCloudContext);
   const [selectedID, setSelectedID] = useState<number | string>('');
   const [isEnlarge, setIsEnlarge_] = useState<boolean>(false);
@@ -132,6 +133,11 @@ const PointCloud2DView = ({
     setIsLargeStatus(isEnlarge);
     setIsEnlarge_(isEnlarge);
     EventBus.emit('2d-image:enlarge', isEnlarge);
+  }, []);
+
+  const setFullScreen = useCallback((fullIndex: number) => {
+    setCurIndex(fullIndex);
+    setIsEnlarge(true);
   }, []);
 
   const worker = useRef<Worker>();
@@ -179,14 +185,25 @@ const PointCloud2DView = ({
 
   /** Keydown events only for `isEnlarge: true` scene  */
   const onKeyDown = useLatest((event: KeyboardEvent) => {
-    if (!isEnlarge) {
-      return;
-    }
-
     // Abort the sibling and the ancestor events propagation
     const abortSiblingAndAncestorPropagation = () => {
       event.stopImmediatePropagation();
     };
+
+    if (!isEnlarge) {
+      // When not in enlarge mode, handle related events for 2D images
+      switch (event.keyCode) {
+        case EKeyCode.Space: {
+          if (hover2DSingleViewIndex !== undefined) {
+            setFullScreen(hover2DSingleViewIndex);
+          }
+          break;
+        }
+      }
+      // First, do the switch, then stop sibling and ancestor elements hotkey event
+      // abortSiblingAndAncestorPropagation();
+      return;
+    }
 
     switch (event.keyCode) {
       case EKeyCode.Esc: {
@@ -308,6 +325,8 @@ const PointCloud2DView = ({
                   showEnlarge={showEnlarge}
                   checkMode={checkMode}
                   measureVisible={measureVisible}
+                  config={config}
+                  index={index}
                 />
               )}
             </PointCloudContainer>

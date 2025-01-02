@@ -181,6 +181,9 @@ export interface IPointCloudContext
 
   isLargeStatus: boolean;
   setIsLargeStatus: (isLargeStatus: boolean) => void;
+
+  hover2DSingleViewIndex: number | undefined;
+  setHover2DSingleViewIndex: (hover2DSingleViewIndex: number | undefined) => void;
 }
 
 const pickRectObject = (rect: IPointCloud2DRectOperationViewRect) => {
@@ -279,6 +282,9 @@ export const PointCloudContext = React.createContext<IPointCloudContext>({
 
   isLargeStatus: false,
   setIsLargeStatus: () => {},
+
+  hover2DSingleViewIndex: undefined,
+  setHover2DSingleViewIndex: () => {},
 });
 
 export const PointCloudProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
@@ -310,6 +316,9 @@ export const PointCloudProvider: React.FC<PropsWithChildren<{}>> = ({ children }
   const [highlight2DDataList, setHighlight2DDataList] = useState<IHighlight2DData[]>([]);
   const [highlight2DLoading, setHighlight2DLoading] = useState<boolean>(false);
   const [isLargeStatus, setIsLargeStatus] = useState<boolean>(false);
+  const [hover2DSingleViewIndex, setHover2DSingleViewIndex] = useState<number | undefined>(
+    undefined,
+  );
   const state = useAnnotatedBoxStore();
   const [visibleBatchSetValid, setVisibleBatchSetValid] = useState<boolean>(false);
 
@@ -844,6 +853,9 @@ export const PointCloudProvider: React.FC<PropsWithChildren<{}>> = ({ children }
 
       isLargeStatus,
       setIsLargeStatus,
+
+      hover2DSingleViewIndex,
+      setHover2DSingleViewIndex,
     };
   }, [
     valid,
@@ -882,6 +894,8 @@ export const PointCloudProvider: React.FC<PropsWithChildren<{}>> = ({ children }
     windowKeydownListenerHook,
     isLargeStatus,
     setIsLargeStatus,
+    hover2DSingleViewIndex,
+    setHover2DSingleViewIndex,
   ]);
 
   useEffect(() => {

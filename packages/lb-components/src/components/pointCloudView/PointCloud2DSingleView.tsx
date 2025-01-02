@@ -3,7 +3,12 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import AnnotationView from '@/components/AnnotationView';
 import useSize from '@/hooks/useSize';
 import { useSingleBox } from './hooks/useSingleBox';
-import { ViewOperation, EPointCloudName } from '@labelbee/lb-annotation';
+import {
+  ViewOperation,
+  EPointCloudName,
+  AttributeUtils,
+  CommonToolUtils,
+} from '@labelbee/lb-annotation';
 import { IAnnotationData2dView, IAnnotationDataTemporarily } from './PointCloud2DView';
 import { useHighlight } from './hooks/useHighlight';
 import HighlightVisible from './components/HighlightVisible';
@@ -13,6 +18,8 @@ import useDataLinkSwitch from './hooks/useDataLinkSwitch';
 
 import PointCloud2DRectOperationView from '@/components/pointCloud2DRectOperationView';
 import { useToolStyleContext } from '@/hooks/useToolStyle';
+import { IPointCloudConfig } from '@labelbee/lb-utils';
+import styleString from '@/constant/styleString';
 
 const PointCloud2DSingleView = ({
   view2dData,
@@ -21,6 +28,8 @@ const PointCloud2DSingleView = ({
   showEnlarge,
   checkMode = false,
   measureVisible,
+  config,
+  index,
 }: {
   view2dData: IAnnotationData2dView;
   setSelectedID: (value: string | number) => void;
@@ -28,6 +37,8 @@ const PointCloud2DSingleView = ({
   showEnlarge: boolean;
   checkMode?: boolean;
   measureVisible?: boolean;
+  config: any;
+  index: number;
 }) => {
   const ref = useRef(null);
   const viewRef = useRef<{ toolInstance: ViewOperation }>();
@@ -43,10 +54,16 @@ const PointCloud2DSingleView = ({
     cacheImageNodeSize,
     setSelectedIDs,
     pointCloudBoxList,
+    defaultAttribute,
+    isLargeStatus,
+    setHover2DSingleViewIndex,
   } = useContext(PointCloudContext);
 
   const { value: toolStyle } = useToolStyleContext();
   const { hiddenText } = toolStyle || {};
+
+  const [highLightborder, setHighLightborder] = useState(false);
+  const [imageAfterBorder, setImageAfterBorder] = useState('');
 
   const hiddenData = !view2dData;
 
@@ -57,6 +74,18 @@ const PointCloud2DSingleView = ({
       imageName: view2dData.path,
     };
   }, [showEnlarge, cuboidBoxIn2DView, view2dData.path]);
+
+  const getLineColor = (config: IPointCloudConfig, attribute = '') => {
+    const style = CommonToolUtils.jsonParser(styleString);
+    const attributeIndex =
+      AttributeUtils.getAttributeIndex(attribute, config?.attributeList ?? []) + 1;
+    const color = config?.attributeList?.find((i: any) => i.value === attribute)?.color;
+    if (color) {
+      return color;
+    }
+
+    return style.attributeLineColor ? style.attributeLineColor[attributeIndex] : '';
+  };
 
   const { rendered: dataLinkRendered, isLinking: isLinkToPointCloudDataOrNot } =
     useDataLinkSwitch(dataLinkSwitchOpts);
@@ -98,6 +127,12 @@ const PointCloud2DSingleView = ({
     focusSelectBox();
   }, [focusSelectBox]);
 
+  useEffect(() => {
+    setImageAfterBorder('none');
+    setHover2DSingleViewIndex(undefined);
+    setHighLightborder(false);
+  }, [isLargeStatus]);
+
   const highlightOnClick = async () => {
     setLoading(true);
     setHighlight2DLoading(true);
@@ -111,8 +146,34 @@ const PointCloud2DSingleView = ({
     }
   };
 
+  const onMouseEnter = useCallback(() => {
+    if (isLargeStatus) return;
+    const border = '1px solid ' + getLineColor(config, defaultAttribute);
+    setImageAfterBorder(border);
+    setHover2DSingleViewIndex(index);
+    setHighLightborder(true);
+  }, [isLargeStatus, getLineColor, config, defaultAttribute, index]);
+
+  const onMouseLeave = useCallback(() => {
+    if (isLargeStatus) return;
+    setImageAfterBorder('none');
+    setHover2DSingleViewIndex(undefined);
+    setHighLightborder(false);
+  }, [isLargeStatus]);
+
   return (
-    <div className={getClassName('point-cloud-2d-image')} ref={ref}>
+    <div
+      className={getClassName('point-cloud-2d-image')}
+      ref={ref}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {highLightborder && !isLargeStatus && (
+        <div
+          className={getClassName('point-cloud-2d-image', 'after')}
+          style={{ border: imageAfterBorder }}
+        />
+      )}
       {cuboidBoxIn2DView ? (
         <AnnotationView
           src={view2dData?.url ?? ''}
