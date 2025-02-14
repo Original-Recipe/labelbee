@@ -81,6 +81,8 @@ class PolygonOperation extends BasicToolOperation {
 
   public selection: Selection;
 
+  private checkoutAttrVer: number; // Version number when switching to the same attribute, used to force updates to the relevant values of the main attribute
+
   constructor(props: IPolygonOperationProps) {
     super({
       ...props,
@@ -91,6 +93,7 @@ class PolygonOperation extends BasicToolOperation {
     this.polygonList = [];
     this.hoverPointIndex = -1;
     this.hoverEdgeIndex = -1;
+    this.checkoutAttrVer = 0;
 
     this.drawingHistory = new ActionsHistory();
     this.isCtrl = false;
@@ -425,11 +428,16 @@ class PolygonOperation extends BasicToolOperation {
     this.emit('selectedChange');
   }
 
+  public setCheckoutAttrVer(checkoutAttrVer: number = 0) {
+    this.checkoutAttrVer = checkoutAttrVer;
+  }
+
   public setDefaultAttribute(defaultAttribute: string = '') {
     const oldDefault = this.defaultAttribute;
     this.defaultAttribute = defaultAttribute;
 
-    if (oldDefault !== defaultAttribute) {
+    // When repeatedly modified to the same primary attribute, the new and old values are the same, but the update logic still needs to be followed, while other scenarios maintain the original logic
+    if (this.checkoutAttrVer || oldDefault !== defaultAttribute) {
       // 如果更改 attribute 需要同步更改 style 的样式
       this.changeStyle(defaultAttribute);
 

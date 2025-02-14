@@ -5,6 +5,8 @@ const pointCloudToolStateCreator: StateCreator<PointCloudToolConfigStore> = (set
   selectBoxVisibleSwitch: false,
   setSelectBoxVisibleSwitch: (selectBoxVisibleSwitch: boolean) =>
     set(() => ({ selectBoxVisibleSwitch })),
+  checkoutAttrVer: 0,
+  setCheckoutAttrVer: (checkoutAttrVer: number) => set(() => ({ checkoutAttrVer })),
 });
 
 export default pointCloudToolStateCreator;

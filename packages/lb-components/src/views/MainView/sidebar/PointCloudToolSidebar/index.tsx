@@ -43,6 +43,8 @@ import { usePointCloudViews } from '@/components/pointCloudView/hooks/usePointCl
 import SubAttributeList from '@/components/subAttributeList';
 import DynamicResizer from '@/components/DynamicResizer';
 import { isNumber } from 'lodash';
+import useToolConfigStore from '@/store/toolConfig';
+
 interface IProps {
   stepInfo: IStepInfo;
   toolInstance: ICustomToolInstance; // Created by useCustomToolInstance.
@@ -224,6 +226,7 @@ const AttributeUpdater = ({
   const { isPointCloudSegmentationPattern } = useStatus();
 
   const dispatch = useDispatch();
+  const { checkoutAttrVer, setCheckoutAttrVer } = useToolConfigStore();
 
   const titleStyle = {
     fontWeight: 500,
@@ -281,6 +284,10 @@ const AttributeUpdater = ({
       return;
     }
 
+    const newCheckoutAttrVer = attribute === defaultAttribute ? checkoutAttrVer + 1 : 0;
+
+    setCheckoutAttrVer(newCheckoutAttrVer);
+    toolInstance.setCheckoutAttrVer(newCheckoutAttrVer);
     toolInstance.setDefaultAttribute(attribute);
   };
 

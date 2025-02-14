@@ -269,6 +269,10 @@ const PointCloudListener: React.FC<IProps> = ({
 
   // Update the listener of toolInstance.
   useEffect(() => {
+    toolInstanceRef.current.setCheckoutAttrVer = (checkoutAttrVer: number) => {
+      ptCtx.topViewInstance?.toolInstance.setCheckoutAttrVer(checkoutAttrVer);
+    };
+
     toolInstanceRef.current.setDefaultAttribute = (newAttribute: string) => {
       syncThreeViewsAttribute(newAttribute);
 
@@ -335,7 +339,6 @@ const PointCloudListener: React.FC<IProps> = ({
       // Avoid triggering SetState operations in the reducer phase
       setTimeout(() => {
         ptCtx.setPointCloudValid(valid);
-
       });
     };
 
