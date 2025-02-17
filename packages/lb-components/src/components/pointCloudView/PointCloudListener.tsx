@@ -269,6 +269,10 @@ const PointCloudListener: React.FC<IProps> = ({
 
   // Update the listener of toolInstance.
   useEffect(() => {
+    toolInstanceRef.current.setAttrChangeTrigger = (attrChangeTrigger: number) => {
+      ptCtx.topViewInstance?.toolInstance.setAttrChangeTrigger(attrChangeTrigger);
+    };
+
     toolInstanceRef.current.setDefaultAttribute = (newAttribute: string) => {
       syncThreeViewsAttribute(newAttribute);
 
@@ -335,7 +339,6 @@ const PointCloudListener: React.FC<IProps> = ({
       // Avoid triggering SetState operations in the reducer phase
       setTimeout(() => {
         ptCtx.setPointCloudValid(valid);
-
       });
     };
 

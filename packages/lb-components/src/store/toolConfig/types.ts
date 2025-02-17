@@ -8,6 +8,9 @@ export interface BaseStore {
 export interface PointCloudToolConfigStore {
   selectBoxVisibleSwitch: boolean;
   setSelectBoxVisibleSwitch: (selectBoxVisibleSwitch: boolean) => void;
+  // Force trigger for updating when switching to the same primary attribute
+  attrChangeTrigger: number;
+  setAttrChangeTrigger: (attrChangeTrigger: number) => void;
 }
 
 // Import all types into toolConfig Store through inheritance

@@ -5,6 +5,8 @@ const pointCloudToolStateCreator: StateCreator<PointCloudToolConfigStore> = (set
   selectBoxVisibleSwitch: false,
   setSelectBoxVisibleSwitch: (selectBoxVisibleSwitch: boolean) =>
     set(() => ({ selectBoxVisibleSwitch })),
+  attrChangeTrigger: 0,
+  setAttrChangeTrigger: (attrChangeTrigger: number) => set(() => ({ attrChangeTrigger })),
 });
 
 export default pointCloudToolStateCreator;

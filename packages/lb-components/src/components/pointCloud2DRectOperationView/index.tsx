@@ -52,7 +52,7 @@ const PointCloud2DRectOperationView = (props: IPointCloud2DRectOperationViewProp
     afterImgOnLoad,
     shouldExcludePointCloudBoxListUpdate,
   } = props;
-  const { selectBoxVisibleSwitch } = useToolConfigStore();
+  const { selectBoxVisibleSwitch, attrChangeTrigger } = useToolConfigStore();
 
   const imageUrl = mappingData?.url ?? '';
   const fallbackUrl = mappingData?.fallbackUrl ?? '';
@@ -270,10 +270,8 @@ const PointCloud2DRectOperationView = (props: IPointCloud2DRectOperationViewProp
 
   const onRightClick = ({ targetId, id }: { targetId: string; id: string }) => {
     setNeedUpdateCenter(false);
-    requestAnimationFrame(() => {
-      updateSelectedIDs(targetId);
-      setRightClickRectId(id);
-    });
+    updateSelectedIDs(targetId);
+    setRightClickRectId(id);
   };
 
   const updateSelectedIDs = (newID: string) => {
@@ -281,6 +279,42 @@ const PointCloud2DRectOperationView = (props: IPointCloud2DRectOperationViewProp
     if (!currentIDs.includes(newID)) {
       setSelectedIDs(newID);
     }
+  };
+
+  const updateRectListAndAttr = () => {
+    const rect = rectListInImage.find((i) => i.id === operation.current.selectedRectID);
+    operation.current?.setDefaultAttribute?.(defaultAttribute);
+
+    if (rect) {
+      // updateRectIn2DView({ ...operation.current?.selectedRect, attribute: defaultAttribute });
+      updateRectListByReducer((preRectList) => {
+        const filtered: IPointCloudBoxRect[] = [];
+        let matched: any = null;
+
+        preRectList.forEach((item: IPointCloudBoxRect) => {
+          if (item.id !== operation.current.selectedRectID) {
+            filtered.push(item);
+          } else {
+            matched = item;
+          }
+        });
+
+        if (rect.extId === undefined) {
+          matched = operation.current?.selectedRect;
+        }
+
+        return [
+          ...filtered,
+          {
+            ...(matched || {}),
+            attribute: defaultAttribute,
+          },
+        ];
+      });
+    }
+    // When the attribute changes, it is necessary to record the status of the previous clicks
+    setIsMemoryChange(true);
+    updateRectList();
   };
 
   useEffect(() => {
@@ -354,40 +388,15 @@ const PointCloud2DRectOperationView = (props: IPointCloud2DRectOperationViewProp
   }, [pointCloudBoxList]);
 
   useEffect(() => {
-    const rect = rectListInImage.find((i) => i.id === operation.current.selectedRectID);
-    operation.current?.setDefaultAttribute?.(defaultAttribute);
-
-    if (rect) {
-      // updateRectIn2DView({ ...operation.current?.selectedRect, attribute: defaultAttribute });
-      updateRectListByReducer((preRectList) => {
-        const filtered: IPointCloudBoxRect[] = [];
-        let matched: any = null;
-
-        preRectList.forEach((item: IPointCloudBoxRect) => {
-          if (item.id !== operation.current.selectedRectID) {
-            filtered.push(item);
-          } else {
-            matched = item;
-          }
-        });
-
-        if (rect.extId === undefined) {
-          matched = operation.current?.selectedRect;
-        }
-
-        return [
-          ...filtered,
-          {
-            ...(matched || {}),
-            attribute: defaultAttribute,
-          },
-        ];
-      });
-    }
-    // When the attribute changes, it is necessary to record the status of the previous clicks
-    setIsMemoryChange(true);
-    updateRectList();
+    updateRectListAndAttr();
   }, [defaultAttribute]);
+
+  useEffect(() => {
+    // Force trigger for updating when switching to the same primary attribute
+    if (attrChangeTrigger) {
+      updateRectListAndAttr();
+    }
+  }, [attrChangeTrigger]);
 
   useEffect(() => {
     const prevRectList = prevRectListRef.current;
