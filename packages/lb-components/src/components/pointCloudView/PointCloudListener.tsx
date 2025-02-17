@@ -269,8 +269,8 @@ const PointCloudListener: React.FC<IProps> = ({
 
   // Update the listener of toolInstance.
   useEffect(() => {
-    toolInstanceRef.current.setCheckoutAttrVer = (checkoutAttrVer: number) => {
-      ptCtx.topViewInstance?.toolInstance.setCheckoutAttrVer(checkoutAttrVer);
+    toolInstanceRef.current.setAttrChangeTrigger = (attrChangeTrigger: number) => {
+      ptCtx.topViewInstance?.toolInstance.setAttrChangeTrigger(attrChangeTrigger);
     };
 
     toolInstanceRef.current.setDefaultAttribute = (newAttribute: string) => {

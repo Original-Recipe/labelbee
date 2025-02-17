@@ -52,7 +52,7 @@ const PointCloud2DRectOperationView = (props: IPointCloud2DRectOperationViewProp
     afterImgOnLoad,
     shouldExcludePointCloudBoxListUpdate,
   } = props;
-  const { selectBoxVisibleSwitch, checkoutAttrVer } = useToolConfigStore();
+  const { selectBoxVisibleSwitch, attrChangeTrigger } = useToolConfigStore();
 
   const imageUrl = mappingData?.url ?? '';
   const fallbackUrl = mappingData?.fallbackUrl ?? '';
@@ -392,10 +392,11 @@ const PointCloud2DRectOperationView = (props: IPointCloud2DRectOperationViewProp
   }, [defaultAttribute]);
 
   useEffect(() => {
-    if (checkoutAttrVer) {
+    // Force trigger for updating when switching to the same primary attribute
+    if (attrChangeTrigger) {
       updateRectListAndAttr();
     }
-  }, [checkoutAttrVer]);
+  }, [attrChangeTrigger]);
 
   useEffect(() => {
     const prevRectList = prevRectListRef.current;

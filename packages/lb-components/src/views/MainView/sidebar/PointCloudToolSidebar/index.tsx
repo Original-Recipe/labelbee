@@ -226,7 +226,7 @@ const AttributeUpdater = ({
   const { isPointCloudSegmentationPattern } = useStatus();
 
   const dispatch = useDispatch();
-  const { checkoutAttrVer, setCheckoutAttrVer } = useToolConfigStore();
+  const { attrChangeTrigger, setAttrChangeTrigger } = useToolConfigStore();
 
   const titleStyle = {
     fontWeight: 500,
@@ -284,10 +284,11 @@ const AttributeUpdater = ({
       return;
     }
 
-    const newCheckoutAttrVer = attribute === defaultAttribute ? checkoutAttrVer + 1 : 0;
+    // When the changing attributes are consistent, trigger+1 ensures forced update
+    const newAttrChangeTrigger = attribute === defaultAttribute ? attrChangeTrigger + 1 : 0;
 
-    setCheckoutAttrVer(newCheckoutAttrVer);
-    toolInstance.setCheckoutAttrVer(newCheckoutAttrVer);
+    setAttrChangeTrigger(newAttrChangeTrigger);
+    toolInstance.setAttrChangeTrigger(newAttrChangeTrigger);
     toolInstance.setDefaultAttribute(attribute);
   };
 
