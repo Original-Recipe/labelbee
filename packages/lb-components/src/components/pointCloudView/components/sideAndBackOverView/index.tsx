@@ -71,12 +71,20 @@ const SideAndBackOverView = (props: IProps) => {
             });
           }
         }}
+        onDragOver={(event) => {
+          // Prevent default drag and drop behavior to prevent shadow issues
+          event.preventDefault();
+        }}
         onDrag={(e: any) => {
+          // Prevent boundary issues caused by dragging and overflowing the screen
+          if (e.clientX === 0 && e.clientY === 0) return;
           const moveX = e.clientX - offset.x;
           const moveY = e.clientY - offset.y;
           setPosition({ x: moveX, y: moveY });
         }}
         onDragEnd={(e: any) => {
+          // Prevent boundary issues caused by dragging and overflowing the screen
+          if (e.clientX === 0 && e.clientY === 0) return;
           const moveX = e.clientX - offset.x;
           const moveY = e.clientY - offset.y;
           setPosition({ x: moveX, y: moveY });
