@@ -59,11 +59,12 @@ export default class TagUtil {
         const [key, value] = cur;
         if (value && value.length > 0) {
           const valueList = value.split(';');
-          const nameList = {
-            keyName: this.getTagKeyName(key, labelInfoSet),
-            value: valueList.map((v: string) => this.getTagName([key, v], labelInfoSet)),
-          };
-          return [...acc, nameList];
+          const keyName = this.getTagKeyName(key, labelInfoSet) ?? '';
+          const values = valueList.map((v: string) => this.getTagName([key, v], labelInfoSet));
+          // 只有当 keyName 存在才添加到结果中
+          if (keyName.trim() !== '') {
+            return [...acc, { keyName, value: values }];
+          }
         }
         return acc;
       }, [])
