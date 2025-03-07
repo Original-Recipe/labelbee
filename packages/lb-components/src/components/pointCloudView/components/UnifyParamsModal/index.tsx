@@ -105,6 +105,10 @@ const sizeOptions = [
     value: 'max',
     label: '最大尺寸',
   },
+  {
+    value: 'ignore',
+    label: '忽略',
+  },
 ];
 
 const UnifyParamsModal = ({ id, visible, onCancel, config, imgList, imgIndex }: IProps) => {
@@ -161,16 +165,19 @@ const UnifyParamsModal = ({ id, visible, onCancel, config, imgList, imgIndex }: 
 
     const { UnifySize } = values;
 
-    Object.assign(
-      newData,
-      size && UnifySize === 'max'
-        ? size
-        : {
-            width: selectedBox?.info?.width,
-            height: selectedBox?.info?.height,
-            depth: selectedBox?.info?.depth,
-          },
-    );
+    // When setting dimensions to ignore, there is no need to set the dimensions of length, width, and height
+    if (values.UnifySize !== 'ignore') {
+      Object.assign(
+        newData,
+        size && UnifySize === 'max'
+          ? size
+          : {
+              width: selectedBox?.info?.width,
+              height: selectedBox?.info?.height,
+              depth: selectedBox?.info?.depth,
+            },
+      );
+    }
 
     dispatch(
       BatchUpdateResultByTrackID(id, newData, [values.prevPage - 1, values.nextPage - 1], imgList),
@@ -297,7 +304,13 @@ const UnifyParamsModal = ({ id, visible, onCancel, config, imgList, imgIndex }: 
                 return (
                   <Radio value={value} key={value}>
                     <div>{label}</div>
-                    <SizeShow selectedBox={selectedBox?.info} size={size} isMax={value === 'max'} />
+                    {value !== 'ignore' && (
+                      <SizeShow
+                        selectedBox={selectedBox?.info}
+                        size={size}
+                        isMax={value === 'max'}
+                      />
+                    )}
                   </Radio>
                 );
               })}
