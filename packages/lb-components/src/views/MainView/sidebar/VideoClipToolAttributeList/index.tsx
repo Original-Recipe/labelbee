@@ -69,7 +69,7 @@ const VideoClipToolAttributeList: React.FC<IProps> = (props) => {
     return null;
   }
 
-  // If the attribute configuration is enabled
+  // If the attribute configuration is enabled, return the attribute list
   const attributeChanged = (v: string) => {
     if (toolInstance) {
       toolInstance.setDefaultAttribute(v);
